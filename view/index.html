@@ -7,7 +7,7 @@
     <!--script imports-->
 
     <!--These are jquery and plugins that we use from jquery-->
-    <script type="text/javascript"
+    <!--<script type="text/javascript"
             src="http://htmltreegrid.com/demo/external/js/adapters/jquery/jquery-1.8.2.js"></script>
     <script type="text/javascript"
             src="http://htmltreegrid.com/demo/external/js/adapters/jquery/jquery-ui-1.9.1.custom.min.js"></script>
@@ -18,9 +18,9 @@
     <script type="text/javascript"
             src="http://htmltreegrid.com/demo/external/js/adapters/jquery/jquery.ui.menu.js"></script>
     <script type="text/javascript"
-            src="http://htmltreegrid.com/demo/external/js/adapters/jquery/jquery.toaster.js"></script>
+            src="http://htmltreegrid.com/demo/external/js/adapters/jquery/jquery.toaster.js"></script>-->
 
-    <!--<script type="text/javascript"
+    <script type="text/javascript"
             src="local/jquery-1.8.2.js"></script>
     <script type="text/javascript"
             src="local/jquery-ui-1.9.1.custom.min.js"></script>
@@ -31,7 +31,7 @@
     <script type="text/javascript"
             src="local/jquery.ui.menu.js"></script>
     <script type="text/javascript"
-            src="local/jquery.toaster.js"></script>-->
+            src="local/jquery.toaster.js"></script>
 
     <script type="text/javascript"
             src="js/lib/html2canvas.js"></script>
@@ -41,6 +41,7 @@
 
     <!--End-->
     <script src="js/lib/grid/minified-compiled-jquery.js"></script>
+    <!--<script src="local/flexiciousgridlibrary.js"></script>-->
     <script src="js/lib/grid/Configuration.js"></script>
     <script src="js/lib/grid/themes.js"></script>
     <script src="js/app/Spinner.js"></script>
@@ -99,7 +100,7 @@
                     filterPageSort.sorts = [];
                     for(var i = 0; i <  sorts.length; i++){
                         filterPageSort.sorts.push({
-                            columnName : sorts[i].sortColumn,
+                            sortColumn : sorts[i].sortColumn,
                             isAscending : sorts[i].isAscending,
                             sortNumeric : sorts[i].sortNumeric
                         });
@@ -122,17 +123,17 @@
 
             });
 
-            var filterPageSort = JSON.stringify({pageSize: grid.getPageSize(), pageIndex: 0});
+            var filterPageSort = {pageSize: grid.getPageSize(), pageIndex: 0};
             var params = QueryString();
             if(params.filterPageSort){
-                filterPageSort = params.filterPageSort;
+                filterPageSort = JSON.parse(params.filterPageSort);
             }
 
 
             $.ajax({
                 type: "GET",
                 url: GridConFig.ApiCallBaseUrl,
-                data: {name: "top_data", filterPageSort: filterPageSort},
+                data: {name: "top_data", filterPageSort: JSON.stringify(filterPageSort)},
                 success: function (res) {
                     if(res.indexOf("<") == 0){
                         alert("Error occur while loading the data.");
@@ -142,8 +143,22 @@
                     if (response.success) {
                         grid.setDataProvider(response.data);
                         grid.setTotalRecords(response.details.totalRecords);
-                        grid.rebuildFilter();
-                        grid.reDraw();
+
+                        if(filterPageSort.pageIndex > 0){
+                            grid.setPageIndex(filterPageSort.pageIndex);
+                            grid.setPageSize(filterPageSort.pageSize);
+                        }
+                        if(filterPageSort.filters){
+                            for(var i = 0; i < filterPageSort.filters.length; i++){
+                                grid.setFilterValue(filterPageSort.filters[i].columnName, filterPageSort.filters[i].value,false);
+                            }
+                        }
+                        if(filterPageSort.sorts){
+                            grid.processSort(filterPageSort.sorts);
+                        }
+
+                        grid.rebuildHeader();
+
                     } else {
                         alert(response.message);
                     }

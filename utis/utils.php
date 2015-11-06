@@ -76,7 +76,7 @@ class Utils
      *
      * sorts = [
      *   {
-     *       columnName  = string,
+     *       sortColumn  = string,
      *       isAscending = boolean,
      *       sortNumeric = boolean
      *   } , .....
@@ -93,7 +93,7 @@ class Utils
     {
          $toReturn = -1;
         foreach ($this->sorts as $sort){
-            $columnName = $sort->columnName;
+            $columnName = $sort->sortColumn;
             $aObjValue = $sort->isAscending ? $aObj->$columnName : $bObj->$columnName;
             $bObjValue = $sort->isAscending ? $bObj->$columnName : $aObj->$columnName;
             if($sort->sortNumeric) {

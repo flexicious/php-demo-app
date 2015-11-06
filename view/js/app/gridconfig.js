@@ -99,7 +99,7 @@ var filerPageSortHandle = function(event){
            filterPageSort.sorts = [];
            for(var i = 0; i <  sorts.length; i++){
                filterPageSort.sorts.push({
-                   columnName : sorts[i].sortColumn,
+                   sortColumn : sorts[i].sortColumn,
                    isAscending : sorts[i].isAscending,
                    sortNumeric : sorts[i].sortNumeric
                });
